@@ -14,6 +14,7 @@ public:
     QList<SignalViewWidget*> m_windgetList;
     SignalViewWidget *m_signalViewWidget1 = nullptr;
     SignalViewWidget *m_signalViewWidget2 = nullptr;
+    SignalViewWidget *m_signalViewWidget3 = nullptr;
     QList<SignalViewWidget *> windgetList() const;
 
     void setData(const MIT_BIH_ECGData& data);

@@ -11,7 +11,6 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
     updateRecordList(ui->lineEditPath->text());
-
     loadStyle();
 }
 
@@ -26,6 +25,7 @@ void MainWindow::on_pushButtonSetPath_clicked()
                                                      "Select Database Path",
                                                      QDir::homePath());
     updateRecordList(path);
+    ui->lineEditPath->setText(path);
 }
 
 
@@ -56,6 +56,7 @@ void MainWindow::setSignalWidget(const QList<SignalViewWidget*> widgetList)
 {
     setupSignal(ui->gridLayoutLead1, widgetList[0]);
     setupSignal(ui->gridLayoutLead2, widgetList[1]);
+    setupSignal(ui->gridLayoutLead2, widgetList[2]);
 }
 
 void MainWindow::updateRecordList(const QString& recordDirectory)
@@ -66,7 +67,7 @@ void MainWindow::updateRecordList(const QString& recordDirectory)
     QDir dir(recordDirectory);
     m_heaFilesWithPath.clear();
     m_headerFilePath.clear();
-
+    ui->listWidgetItems->clear();
     QFileInfoList infoList = dir.entryInfoList();
     for (const QFileInfo& info : std::as_const(infoList)) {
         if (info.suffix() == "hea") {
@@ -118,5 +119,11 @@ void MainWindow::on_pushButtonExport_clicked()
     if(DirectoryValidator::validateDirectory(path))
         Q_EMIT sigExportRequested(path);
     else QMessageBox::critical(nullptr, "Dir Validation", "Dir is invalid");
+}
+
+
+void MainWindow::on_pushButtonUpdate_clicked()
+{
+    on_pushButtonRead_clicked();
 }
 

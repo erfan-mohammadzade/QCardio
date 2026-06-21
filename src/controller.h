@@ -6,6 +6,7 @@
 #include "./Controller/cwfdb.h"
 #include "./Controller/csignalview.h"
 #include "./Controller/cexporter.h"
+#include <QtConcurrent/QtConcurrent>
 #include <QGuiApplication>
 class Controller : public QObject
 {
@@ -18,7 +19,8 @@ public:
     CExporter* m_cexporter = nullptr;
 
 signals:
-
+    void sigReadDataProcessEnd();
+    void sigExportProcessEnd();
 public Q_SLOTS:
     void sltOpenRecord(const SignalViewParameters& params);
     void sltExportRequested(const QString& path);

@@ -22,16 +22,17 @@ void Cwfdb::clearVec()
         delete signalInfo;
     if(sampleVector)
         delete sampleVector;
+    m_strData.clear();
 }
 
 void Cwfdb::readData(const SignalViewParameters &params)
 {
+    qDebug() << "111";
     clearVec();
     setwfdb(const_cast<char*>(params.DatabasePath.toStdString().c_str()));
 
     int numberOfSignals = 0;
     std::vector<WFDB_Siginfo> siginfo;
-    // WFDB_Siginfo vahid[WFDB_MAXSIG];
     WFDB_Frequency target_fs = params.targetFs;
     setifreq(target_fs);
     numberOfSignals = isigopen(const_cast<char*>(params.signalFilePath.toStdString().c_str()), NULL, 0);
@@ -47,10 +48,7 @@ void Cwfdb::readData(const SignalViewParameters &params)
         long totalSamples = siginfo[0].nsamp;
 
         // Create a 2D vector to store all samples
-        std::vector<std::vector<WFDB_Sample>> allData(
-            numberOfSignals,
-            std::vector<WFDB_Sample>(totalSamples)
-            );
+        std::vector<std::vector<WFDB_Sample>> allData(numberOfSignals, std::vector<WFDB_Sample>(totalSamples));
 
         // Read all samples
         for (long sampleIndex = 0; sampleIndex < totalSamples; ++sampleIndex) {
