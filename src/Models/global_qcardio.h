@@ -35,6 +35,9 @@ struct SignalViewParameters
 {
     QString signalFilePath;
     QString DatabasePath;
+    int targetFs = 178;
+    float gain = 1.0;
+    float offset = 0.0;
 };
 
 #endif // GLOBAL_QCARDIO_H

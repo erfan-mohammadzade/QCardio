@@ -6,7 +6,7 @@
 #include "./Controller/cwfdb.h"
 #include "./Controller/csignalview.h"
 #include "./Controller/cexporter.h"
-
+#include <QGuiApplication>
 class Controller : public QObject
 {
     Q_OBJECT

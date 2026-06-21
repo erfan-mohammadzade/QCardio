@@ -11,6 +11,8 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
     updateRecordList(ui->lineEditPath->text());
+
+    loadStyle();
 }
 
 MainWindow::~MainWindow()
@@ -35,6 +37,9 @@ void MainWindow::on_pushButtonRead_clicked()
         SignalViewParameters params;
         params.DatabasePath = path;
         params.signalFilePath = m_heaFilesWithPath.at(m_listItemIdx);
+        params.targetFs = ui->spinBoxTargetFreq->value();
+        params.gain = ui->doubleSpinBoxGain->value();
+        params.offset = ui->spinBoxOffset->value();
         Q_EMIT sigReadDataRequested(params);
     }
     else
@@ -72,11 +77,19 @@ void MainWindow::updateRecordList(const QString& recordDirectory)
     ui->listWidgetItems->addItems(m_heaFilesWithPath);
 }
 
+void MainWindow::loadStyle()
+{
+    QFile styleFile(":/Res/style/style.qss");
+    styleFile.open(QFile::ReadOnly);
+    QString style = QLatin1String(styleFile.readAll());
+    setStyleSheet(style);
+}
+
 void MainWindow::on_listWidgetItems_currentRowChanged(int currentRow)
 {
     // Handle invalid selection
     if (currentRow < 0 || currentRow >= m_headerFilePath.size()) {
-        ui->textEdit->clear();
+        ui->textEditSignalInfo->clear();
         m_listItemIdx = -1;
         return;
     }
@@ -87,16 +100,16 @@ void MainWindow::on_listWidgetItems_currentRowChanged(int currentRow)
 
     if (!file.open(QIODevice::ReadOnly)) {
         // Handle error - show message or clear text
-        ui->textEdit->clear();
-        ui->textEdit->setText("Error: Could not open file");
+        ui->textEditSignalInfo->clear();
+        ui->textEditSignalInfo->setText("Error: Could not open file");
         return;
     }
 
     QByteArray data = file.readAll();
     file.close();  // Explicitly close
 
-    ui->textEdit->clear();
-    ui->textEdit->setText(data);
+    ui->textEditSignalInfo->clear();
+    ui->textEditSignalInfo->setText(data);
 }
 
 void MainWindow::on_pushButtonExport_clicked()

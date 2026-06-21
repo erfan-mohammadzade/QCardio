@@ -31,7 +31,9 @@ void Cwfdb::readData(const SignalViewParameters &params)
 
     int numberOfSignals = 0;
     std::vector<WFDB_Siginfo> siginfo;
-
+    // WFDB_Siginfo vahid[WFDB_MAXSIG];
+    WFDB_Frequency target_fs = params.targetFs;
+    setifreq(target_fs);
     numberOfSignals = isigopen(const_cast<char*>(params.signalFilePath.toStdString().c_str()), NULL, 0);
 
     if (numberOfSignals > 0) {
@@ -76,7 +78,7 @@ void Cwfdb::readData(const SignalViewParameters &params)
         for (int signalIndex = 0; signalIndex < numberOfSignals; ++signalIndex) {
             nsig.clear();
             for (long sampleIndex = 0; sampleIndex < totalSamples; ++sampleIndex) {
-                nsig.append(allData[signalIndex][sampleIndex]);
+                nsig.append((allData[signalIndex][sampleIndex]*params.gain)+params.offset);
             }
             sigList.append(nsig);
         }

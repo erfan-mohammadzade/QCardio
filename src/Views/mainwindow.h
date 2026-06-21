@@ -24,7 +24,7 @@ public:
     ~MainWindow();
     void setSignalWidget(const QList<SignalViewWidget *> widgetList);
     void updateRecordList(const QString &recordDirectory);
-
+    void loadStyle();
 
 private slots:
     void on_pushButtonSetPath_clicked();

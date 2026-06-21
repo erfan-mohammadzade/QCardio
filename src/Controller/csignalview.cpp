@@ -29,6 +29,7 @@ QList<SignalViewWidget *> CSignalView::windgetList() const
 
 void CSignalView::setData(const MIT_BIH_ECGData &data)
 {
+    if(data.nsigs.empty()) return;
     m_signalViewWidget1->setData(data.nsigs[0]);
     m_signalViewWidget2->setData(data.nsigs[1]);
 }
