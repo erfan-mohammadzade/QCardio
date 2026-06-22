@@ -27,9 +27,8 @@ void Cwfdb::clearVec()
 
 void Cwfdb::readData(const SignalViewParameters &params)
 {
-    qDebug() << "111";
     clearVec();
-    setwfdb(const_cast<char*>(params.DatabasePath.toStdString().c_str()));
+    setwfdb(const_cast<char*>(params.dbPath.toStdString().c_str()));
 
     int numberOfSignals = 0;
     std::vector<WFDB_Siginfo> siginfo;
@@ -69,7 +68,10 @@ void Cwfdb::readData(const SignalViewParameters &params)
         }
 
         // QVector<Sample> sampleData
-
+        for(int i = 0 ; i < SAVED_LEAD_COUNT; i++)
+            m_strData.selectedLead[i] = params.selectedLead[i];
+        m_strData.filename = params.signalFilePath;
+        m_strData.dbName = params.dbName;
         // Now you can access all data
         QVector<qreal> nsig;
         QVector<QVector<qreal>> sigList;

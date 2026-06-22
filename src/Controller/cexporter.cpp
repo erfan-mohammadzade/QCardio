@@ -39,14 +39,17 @@ void CExporter::exportDataInSample(const MIT_BIH_ECGData &data, const QString& p
 
         // Fill the sample with data from each lead
         for (int j = 0; j < numLeads; ++j) {
-            sample.leads[j] = data.nsigs[j][i];
+
+            if(data.selectedLead[j] > 2)
+                sample.leads[j] = 0;
+            else
+                sample.leads[data.selectedLead[j]] = data.nsigs[j][i];
         }
         dataVec.append(sample);
     }
 
     // Generate filename with timestamp
-    QString datestr = QDateTime::currentDateTime().toString("yyyyMMdd_hhmm");
-    QString filePath = path + QDir::separator() + QString("ECG_Export_%1.bin").arg(datestr);
+    QString filePath = path + QDir::separator() + QString("%1_%2.bin").arg(data.dbName, data.filename);
 
     QFile file(filePath);
     if (!file.open(QIODevice::WriteOnly | QIODevice::Truncate)) {

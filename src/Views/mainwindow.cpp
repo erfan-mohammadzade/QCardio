@@ -35,11 +35,15 @@ void MainWindow::on_pushButtonRead_clicked()
     if(DirectoryValidator::validateDirectory(path))
     {
         SignalViewParameters params;
-        params.DatabasePath = path;
+        params.dbPath = path;
         params.signalFilePath = m_heaFilesWithPath.at(m_listItemIdx);
         params.targetFs = ui->spinBoxTargetFreq->value();
         params.gain = ui->doubleSpinBoxGain->value();
         params.offset = ui->spinBoxOffset->value();
+        params.selectedLead[0] = ui->comboBoxSignal1->currentIndex();
+        params.selectedLead[1] = ui->comboBoxSignal2->currentIndex();
+        params.selectedLead[2] = ui->comboBoxSignal3->currentIndex();
+        params.dbName = ui->comboBoxDatabaseName->currentText();
         Q_EMIT sigReadDataRequested(params);
     }
     else

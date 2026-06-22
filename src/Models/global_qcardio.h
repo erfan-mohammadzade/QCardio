@@ -5,7 +5,7 @@
 #include <QDir>
 #include <QMessageBox>
 #include <QFile>
-
+#define LEAD_COUNT 3
 enum DirectoryValidationFlags {
     Exists = 0x01,
     Readable = 0x02,
@@ -18,8 +18,11 @@ enum DirectoryValidationFlags {
 
 struct MIT_BIH_ECGData
 {
+    QString filename;
+    QString dbName;
     int totalSample = 0;
     QVector<QVector<qreal>> nsigs;
+    quint8 selectedLead[LEAD_COUNT];
     void clear()
     {
         for(QVector<qreal> sig: nsigs)
@@ -34,7 +37,9 @@ struct MIT_BIH_ECGData
 struct SignalViewParameters
 {
     QString signalFilePath;
-    QString DatabasePath;
+    QString dbPath;
+    QString dbName;
+    quint8 selectedLead[LEAD_COUNT];
     int targetFs = 178;
     float gain = 1.0;
     float offset = 0.0;

@@ -5,25 +5,24 @@
 #include <QDataStream>
 
 // Define the count of leads (adjust based on your needs)
-#ifndef SAMPLE_LEAD_COUNT
-#define SAMPLE_LEAD_COUNT 3  // Change this to match your requirements
+#ifndef SAVED_LEAD_COUNT
+#define SAVED_LEAD_COUNT 3  // Change this to match your requirements
 #endif
 
 #include <QByteArray>
 #include <QDataStream>
 #include <QVector>
 
-
 struct Sample
 {
-    qint16 leads[SAMPLE_LEAD_COUNT];
+    qint16 leads[SAVED_LEAD_COUNT];
     qint16 status = 0;
     quint8 batteryLevel = 255;
     quint8 leadFailed = 0;
 
     inline void clear()
     {
-        for (quint8 lIdx = 0; lIdx < SAMPLE_LEAD_COUNT; lIdx++)
+        for (quint8 lIdx = 0; lIdx < SAVED_LEAD_COUNT; lIdx++)
         {
             leads[lIdx] = 0;
         }
@@ -32,22 +31,22 @@ struct Sample
         status = 0;
     }
 
-    inline void toByteArray(QByteArray& bt) const
-    {
-        bt.append(reinterpret_cast<const char*>(this), sizeof(*this));
-    }
+    // inline void toByteArray(QByteArray& bt) const
+    // {
+    //     bt.append(reinterpret_cast<const char*>(this), sizeof(*this));
+    // }
 
-    inline void fromByteArray(const QByteArray& bt, quint64 sIdx)
-    {
-        char* ptr = reinterpret_cast<char*>(this);
-        for (quint8 i = 0; i < sizeof(*this); i++)
-        {
-            *(ptr++) = bt.at(i + sIdx);
-        }
-    }
+    // inline void fromByteArray(const QByteArray& bt, quint64 sIdx)
+    // {
+    //     char* ptr = reinterpret_cast<char*>(this);
+    //     for (quint8 i = 0; i < sizeof(*this); i++)
+    //     {
+    //         *(ptr++) = bt.at(i + sIdx);
+    //     }
+    // }
 
     friend QDataStream &operator<<(QDataStream &out, const Sample &myStruct) {
-        for (int i = 0; i < SAMPLE_LEAD_COUNT; i++)
+        for (int i = 0; i < SAVED_LEAD_COUNT; i++)
         {
             out << myStruct.leads[i];
         }
@@ -56,7 +55,7 @@ struct Sample
     }
 
     friend QDataStream &operator>>(QDataStream &in, Sample &myStruct) {
-        for (int i = 0; i < SAMPLE_LEAD_COUNT; i++)
+        for (int i = 0; i < SAVED_LEAD_COUNT; i++)
         {
             in >> myStruct.leads[i];
         }
