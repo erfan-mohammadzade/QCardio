@@ -11,6 +11,7 @@ class CExporter : public QObject
 public:
     explicit CExporter(QObject *parent = nullptr);
     void exportDataInSample(const MIT_BIH_ECGData& data, const QString &path);
+    bool exportDataInRC7(const MIT_BIH_ECGData& data, const QString &path);
 
 signals:
 };

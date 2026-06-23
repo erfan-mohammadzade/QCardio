@@ -6,6 +6,7 @@
 #include <QMessageBox>
 #include <QFile>
 #define LEAD_COUNT 3
+
 enum DirectoryValidationFlags {
     Exists = 0x01,
     Readable = 0x02,
@@ -20,9 +21,12 @@ struct MIT_BIH_ECGData
 {
     QString filename;
     QString dbName;
-    int totalSample = 0;
+    qint64 totalSample = 0;
+    quint16 sampling       = 178;
     QVector<QVector<qreal>> nsigs;
     quint8 selectedLead[LEAD_COUNT];
+    QDateTime recordDate   = QDateTime(QDate(2000,1,1),QTime(0,0,0));
+
     void clear()
     {
         for(QVector<qreal> sig: nsigs)

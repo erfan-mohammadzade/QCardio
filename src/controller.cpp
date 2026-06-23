@@ -34,7 +34,8 @@ void Controller::sltOpenRecord(const SignalViewParameters& params)
 void Controller::sltExportRequested(const QString &path)
 {
     QtConcurrent::run(QThreadPool::globalInstance(),[=] {
-        m_cexporter->exportDataInSample(m_cwfdb->getStructData(), path);
+        // m_cexporter->exportDataInSample(m_cwfdb->getStructData(), path);
+        m_cexporter->exportDataInRC7(m_cwfdb->getStructData(), path);
         Q_EMIT sigExportProcessEnd();
     });
 }
