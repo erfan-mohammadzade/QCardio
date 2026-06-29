@@ -31,19 +31,12 @@ void MainWindow::on_pushButtonSetPath_clicked()
 
 void MainWindow::on_pushButtonRead_clicked()
 {
+    enableUIBtn(false);
+
     QString path = ui->lineEditPath->text();
     if(DirectoryValidator::validateDirectory(path))
     {
-        SignalViewParameters params;
-        params.dbPath = path;
-        params.signalFilePath = m_heaFilesWithPath.at(m_listItemIdx);
-        params.targetFs = ui->spinBoxTargetFreq->value();
-        params.gain = ui->doubleSpinBoxGain->value();
-        params.offset = ui->spinBoxOffset->value();
-        params.selectedLead[0] = ui->comboBoxSignal1->currentIndex();
-        params.selectedLead[1] = ui->comboBoxSignal2->currentIndex();
-        params.selectedLead[2] = ui->comboBoxSignal3->currentIndex();
-        params.dbName = ui->comboBoxDatabaseName->currentText();
+        SignalViewParameters params = readSignalSetting();
         Q_EMIT sigReadDataRequested(params);
     }
     else
@@ -54,6 +47,29 @@ void MainWindow::setupSignal(QGridLayout *mainLayout, SignalViewWidget* signalVi
 {
     signalView->setMinimumHeight(200);
     mainLayout->addWidget(signalView);
+}
+
+ExprotSetting::ExportMethod MainWindow::getExportMethod()
+{
+    if(ui->radioButtonRec7->isChecked())
+        return ExprotSetting::ExportMethod::RC7;
+    else if(ui->radioButtonRawSample->isChecked())
+        return ExprotSetting::ExportMethod::RawSample;
+}
+
+SignalViewParameters MainWindow::readSignalSetting()
+{
+    SignalViewParameters params;
+    params.dbPath = ui->lineEditPath->text();
+    params.signalFilePath = m_heaFilesWithPath.at(m_listItemIdx);
+    params.targetFs = ui->spinBoxTargetFreq->value();
+    params.gain = ui->doubleSpinBoxGain->value();
+    params.offset = ui->spinBoxOffset->value();
+    params.selectedLead[0] = ui->comboBoxSignal1->currentIndex();
+    params.selectedLead[1] = ui->comboBoxSignal2->currentIndex();
+    params.selectedLead[2] = ui->comboBoxSignal3->currentIndex();
+    params.dbName = ui->comboBoxDatabaseName->currentText();
+    return params;
 }
 
 void MainWindow::setSignalWidget(const QList<SignalViewWidget*> widgetList)
@@ -90,6 +106,13 @@ void MainWindow::loadStyle()
     setStyleSheet(style);
 }
 
+void MainWindow::enableUIBtn(const bool& isEnable)
+{
+    ui->pushButtonExport->setEnabled(isEnable);
+    ui->pushButtonRead->setEnabled(isEnable);
+    ui->pushButtonUpdate->setEnabled(isEnable);
+}
+
 void MainWindow::on_listWidgetItems_currentRowChanged(int currentRow)
 {
     // Handle invalid selection
@@ -111,7 +134,7 @@ void MainWindow::on_listWidgetItems_currentRowChanged(int currentRow)
     }
 
     QByteArray data = file.readAll();
-    file.close();  // Explicitly close
+    file.close();
 
     ui->textEditSignalInfo->clear();
     ui->textEditSignalInfo->setText(data);
@@ -121,8 +144,24 @@ void MainWindow::on_pushButtonExport_clicked()
 {
     QString path = QFileDialog::getExistingDirectory(nullptr, "Select Directory To Export", QDir::homePath());
     if(DirectoryValidator::validateDirectory(path))
-        Q_EMIT sigExportRequested(path);
-    else QMessageBox::critical(nullptr, "Dir Validation", "Dir is invalid");
+    {
+        enableUIBtn(false);
+        ExprotSetting expSetting;
+        expSetting.method = getExportMethod();
+        expSetting.params = readSignalSetting();
+        expSetting.outputPath = path;
+        expSetting.pathList = m_heaFilesWithPath;
+        expSetting.compressingRequsted = ui->checkBoxCompression->isChecked();
+        if(!ui->checkBoxExportAllData->isChecked())
+            Q_EMIT sigExportRequested(path);
+        else
+        {
+            Q_EMIT sigExportAllRequested(expSetting);
+        }
+    }
+    else
+        QMessageBox::critical(nullptr, "Dir Validation", "Dir is invalid");
+
 }
 
 

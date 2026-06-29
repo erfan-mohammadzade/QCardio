@@ -25,26 +25,41 @@ void Cwfdb::clearVec()
     m_strData.clear();
 }
 
-void Cwfdb::readData(const SignalViewParameters &params)
+
+bool Cwfdb::readData(const SignalViewParameters &params)
 {
     clearVec();
     setwfdb(const_cast<char*>(params.dbPath.toStdString().c_str()));
 
+    qDebug() << "SN " << params.signalFilePath << "DB " <<params.dbName << "PA "<<params.dbPath;
+
     int numberOfSignals = 0;
-    std::vector<WFDB_Siginfo> siginfo;
+    // std::vector<WFDB_Siginfo> siginfo;
     WFDB_Frequency target_fs = params.targetFs;
-    setifreq(target_fs);
     numberOfSignals = isigopen(const_cast<char*>(params.signalFilePath.toStdString().c_str()), NULL, 0);
 
+    std::vector<WFDB_Siginfo> siginfo(numberOfSignals);
+    if (isigopen(const_cast<char*>(params.signalFilePath.toStdString().c_str()), siginfo.data(), numberOfSignals) != numberOfSignals) {
+        qDebug() << "Failed to read header";
+        return false;
+    }
+
+    if(setifreq(target_fs) != 0)
+        return false;
+
     if (numberOfSignals > 0) {
-        siginfo.resize(numberOfSignals);
+        // siginfo.resize(numberOfSignals);
 
         if (isigopen(const_cast<char*>(params.signalFilePath.toStdString().c_str()), siginfo.data(), numberOfSignals) != numberOfSignals) {
             qDebug() << "Failed to read header";
-            return;
+            return false;
         }
 
         long totalSamples = siginfo[0].nsamp;
+        if (totalSamples <= 0) {
+            qDebug() << "No samples in file";
+            return false;
+        }
 
         // Create a 2D vector to store all samples
         std::vector<std::vector<WFDB_Sample>> allData(numberOfSignals, std::vector<WFDB_Sample>(totalSamples));
@@ -53,11 +68,11 @@ void Cwfdb::readData(const SignalViewParameters &params)
         for (long sampleIndex = 0; sampleIndex < totalSamples; ++sampleIndex) {
             WFDB_Sample* signalData = new WFDB_Sample[numberOfSignals];
 
-            if (getvec(signalData) < 0) {
+            /*if (*/getvec(signalData);/* < 0) {
                 qDebug() << "Error reading sample at index" << sampleIndex;
                 delete[] signalData;
                 break;
-            }
+            }*/
 
             // CORRECTED: Use signalIndex to access signalData
             for (int signalIndex = 0; signalIndex < numberOfSignals; ++signalIndex) {
@@ -84,7 +99,10 @@ void Cwfdb::readData(const SignalViewParameters &params)
         }
         m_strData.totalSample = totalSamples;
         m_strData.nsigs = sigList;
+        if(totalSamples > 1000)
+            return true;
     }
+    return false;
 }
 
 

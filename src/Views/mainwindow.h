@@ -25,6 +25,7 @@ public:
     void setSignalWidget(const QList<SignalViewWidget *> widgetList);
     void updateRecordList(const QString &recordDirectory);
     void loadStyle();
+    void enableUIBtn(const bool &isEnable);
 
 private slots:
     void on_pushButtonSetPath_clicked();
@@ -42,6 +43,8 @@ private:
     Ui::MainWindow *ui;
 
     void setupSignal(QGridLayout* mainLayout, SignalViewWidget* signalWidget);
+    ExprotSetting::ExportMethod getExportMethod();
+    SignalViewParameters readSignalSetting();
     int m_listItemIdx = 0;
     QStringList m_heaFilesWithPath;
     QStringList m_headerFilePath;
@@ -49,5 +52,6 @@ private:
 Q_SIGNALS:
     void sigReadDataRequested(const SignalViewParameters& params);
     void sigExportRequested(const QString& path);
+    void sigExportAllRequested(const ExprotSetting &setting);
 };
 #endif // MAINWINDOW_H

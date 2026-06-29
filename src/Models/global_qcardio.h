@@ -49,4 +49,18 @@ struct SignalViewParameters
     float offset = 0.0;
 };
 
+struct ExprotSetting
+{
+    enum ExportMethod
+    {
+        RawSample,
+        RC7
+    };
+    ExportMethod method = RawSample;
+    QString outputPath;
+    SignalViewParameters params;
+    QStringList pathList;
+    bool compressingRequsted = true;
+};
+
 #endif // GLOBAL_QCARDIO_H

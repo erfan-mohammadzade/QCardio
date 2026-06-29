@@ -21,9 +21,13 @@ public:
 signals:
     void sigReadDataProcessEnd();
     void sigExportProcessEnd();
+    void sigReadAutomaticDataRequested(const SignalViewParameters& params);
+
 public Q_SLOTS:
     void sltOpenRecord(const SignalViewParameters& params);
     void sltExportRequested(const QString& path);
+    void sltExportAllRequested(const ExprotSetting &setting);
+
 };
 
 #endif // CONTROLLER_H

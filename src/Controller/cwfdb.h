@@ -21,7 +21,7 @@ public:
 
 
     void clearVec();
-    void readData(const SignalViewParameters &params);
+    bool readData(const SignalViewParameters &params);
     MIT_BIH_ECGData getStructData() const;
 
 signals:
