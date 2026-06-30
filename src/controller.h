@@ -8,6 +8,7 @@
 #include "./Controller/cexporter.h"
 #include <QtConcurrent/QtConcurrent>
 #include <QGuiApplication>
+#include "Controller/csettings.h"
 class Controller : public QObject
 {
     Q_OBJECT
@@ -17,6 +18,8 @@ public:
     Cwfdb *m_cwfdb = nullptr;
     CSignalView* m_csignalView = nullptr;
     CExporter* m_cexporter = nullptr;
+    UIConfigs m_uiConfig;
+    CSettings m_csetting;
 
 signals:
     void sigReadDataProcessEnd();

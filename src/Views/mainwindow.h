@@ -8,7 +8,8 @@
 #include <Models/directoryvalidator.h>
 #include <Views/signalviewwidget.h>
 #include <QFileInfo>
-
+#include "Models/uiconfigs.h"
+#include "Controller/csettings.h"
 QT_BEGIN_NAMESPACE
 namespace Ui {
 class MainWindow;
@@ -26,6 +27,10 @@ public:
     void updateRecordList(const QString &recordDirectory);
     void loadStyle();
     void enableUIBtn(const bool &isEnable);
+    void loadUIConfig(const UIConfigs& uiConfig);
+    void getUIConfig(UIConfigs &uiConfig);
+
+    void setSetting(CSettings *newSetting);
 
 private slots:
     void on_pushButtonSetPath_clicked();
@@ -43,15 +48,20 @@ private:
     Ui::MainWindow *ui;
 
     void setupSignal(QGridLayout* mainLayout, SignalViewWidget* signalWidget);
+    void saveSetting();
     ExprotSetting::ExportMethod getExportMethod();
     SignalViewParameters readSignalSetting();
     int m_listItemIdx = 0;
     QStringList m_heaFilesWithPath;
     QStringList m_headerFilePath;
+    CSettings *m_setting;
 
 Q_SIGNALS:
     void sigReadDataRequested(const SignalViewParameters& params);
     void sigExportRequested(const QString& path);
     void sigExportAllRequested(const ExprotSetting &setting);
+
+protected:
+    void closeEvent(QCloseEvent*event) override;
 };
 #endif // MAINWINDOW_H

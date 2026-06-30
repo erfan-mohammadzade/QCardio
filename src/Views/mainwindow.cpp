@@ -49,6 +49,13 @@ void MainWindow::setupSignal(QGridLayout *mainLayout, SignalViewWidget* signalVi
     mainLayout->addWidget(signalView);
 }
 
+void MainWindow::saveSetting()
+{
+    UIConfigs uiConfig;
+    getUIConfig(uiConfig);
+    m_setting->saveSetting(uiConfig);
+}
+
 ExprotSetting::ExportMethod MainWindow::getExportMethod()
 {
     if(ui->radioButtonRec7->isChecked())
@@ -70,6 +77,17 @@ SignalViewParameters MainWindow::readSignalSetting()
     params.selectedLead[2] = ui->comboBoxSignal3->currentIndex();
     params.dbName = ui->comboBoxDatabaseName->currentText();
     return params;
+}
+
+void MainWindow::setSetting(CSettings *newSetting)
+{
+    m_setting = newSetting;
+}
+
+void MainWindow::closeEvent(QCloseEvent *event)
+{
+    saveSetting();
+    event->accept();
 }
 
 void MainWindow::setSignalWidget(const QList<SignalViewWidget*> widgetList)
@@ -111,6 +129,35 @@ void MainWindow::enableUIBtn(const bool& isEnable)
     ui->pushButtonExport->setEnabled(isEnable);
     ui->pushButtonRead->setEnabled(isEnable);
     ui->pushButtonUpdate->setEnabled(isEnable);
+}
+
+void MainWindow::loadUIConfig(const UIConfigs &uiConfig)
+{
+    ui->lineEditPath->setText(uiConfig.dataBasePath());
+    ui->comboBoxDatabaseName->setCurrentText(uiConfig.dataBaseName());
+    ui->comboBoxSignal1->setCurrentIndex(uiConfig.lineEditSignal1Index());
+    ui->comboBoxSignal2->setCurrentIndex(uiConfig.lineEditSignal2Index());
+    ui->comboBoxSignal3->setCurrentIndex(uiConfig.lineEditSignal3Index());
+    ui->doubleSpinBoxGain->setValue(uiConfig.gainSignal());
+    ui->spinBoxTargetFreq->setValue(uiConfig.targetFreq());
+    ui->checkBoxExportAllData->setChecked(uiConfig.exportAll());
+    ui->radioButtonRec7->setChecked(uiConfig.exportRC7());
+    ui->radioButtonRawSample->setChecked(uiConfig.exportRaw());
+}
+
+void MainWindow::getUIConfig(UIConfigs &uiConfig)
+{
+    uiConfig.setDataBasePath(ui->lineEditPath->text());
+    uiConfig.setDataBaseName(ui->comboBoxDatabaseName->currentText());
+    uiConfig.setLineEditSignal1Index(ui->comboBoxSignal1->currentIndex());
+    uiConfig.setLineEditSignal2Index(ui->comboBoxSignal2->currentIndex());
+    uiConfig.setLineEditSignal3Index(ui->comboBoxSignal3->currentIndex());
+    uiConfig.setTargetFreq(ui->spinBoxTargetFreq->value());
+    uiConfig.setGainSignal(ui->doubleSpinBoxGain->value());
+    uiConfig.setSignalOfset(ui->spinBoxOffset->value());
+    uiConfig.setExportAll(ui->checkBoxExportAllData->isChecked());
+    uiConfig.setExportRC7(ui->radioButtonRec7->isChecked());
+    uiConfig.setExportRaw(ui->radioButtonRawSample->isChecked());
 }
 
 void MainWindow::on_listWidgetItems_currentRowChanged(int currentRow)
@@ -169,4 +216,5 @@ void MainWindow::on_pushButtonUpdate_clicked()
 {
     on_pushButtonRead_clicked();
 }
+
 

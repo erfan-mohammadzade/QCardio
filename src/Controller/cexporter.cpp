@@ -68,7 +68,6 @@ void CExporter::exportDataInSample(const MIT_BIH_ECGData &data, const QString& p
     file.close();
 }
 
-
 bool CExporter::exportDataInRC7(const MIT_BIH_ECGData &data, const QString &path)
 {
     if (data.nsigs.isEmpty()) {
@@ -113,35 +112,41 @@ bool CExporter::exportDataInRC7(const MIT_BIH_ECGData &data, const QString &path
         int samplesInThisPacket = qMin(samplesPerPacket, totalSamples - (int)sampleIdx);
 
         // Write 840 samples (5 bytes per sample = 4200 bytes)
-        for (int i = 0; i < samplesPerPacket; i++) {
-            quint16 lead0 = 0, lead1 = 0, lead2 = 0;
+        for (int i = 0; i < samplesPerPacket; i++)
+        {
+            quint16 leadI = 0, leadII = 0, leadV = 0;
 
-            if (i < samplesInThisPacket) {
+            if (i < samplesInThisPacket)
+            {
                 int sampleIndex = sampleIdx + i;
+                leadI = leadII = leadV = 0;
 
-                // Map leads (assuming nsigs contains lead data)
-                if (numLeads > 0 && data.selectedLead[0] >= 0 && data.selectedLead[0] < data.nsigs.size()) {
-                    lead0 = data.nsigs[data.selectedLead[0]][sampleIndex];
-                }
-                if (numLeads > 1 && data.selectedLead[1] >= 0 && data.selectedLead[1] < data.nsigs.size()) {
-                    lead1 = data.nsigs[data.selectedLead[1]][sampleIndex];
-                }
-                if (numLeads > 2 && data.selectedLead[2] >= 0 && data.selectedLead[2] < data.nsigs.size()) {
-                    lead2 = data.nsigs[data.selectedLead[2]][sampleIndex];
+                // Process all available signals
+                for (size_t sigIdx = 0; sigIdx < data.nsigs.size() && sigIdx < 3; ++sigIdx) {
+                    int leadType = data.selectedLead[sigIdx];
+                    int signalValue = data.nsigs[sigIdx][sampleIndex];
+
+                    // Map to appropriate lead variable
+                    switch (leadType) {
+                    case 0: leadI = signalValue; break;
+                    case 1: leadII = signalValue; break;
+                    case 2: leadV = signalValue; break;
+                    default: break; // Invalid lead type
+                    }
                 }
             }
 
             // Pack 3 leads into 5 bytes (matching the original format)
-            quint8 byte0 = static_cast<quint8>(lead0 & 0x00FF);
-            quint8 byte1 = static_cast<quint8>(lead1 & 0x00FF);
-            quint8 byte2 = static_cast<quint8>(((lead0 & 0x0F00) >> 8) | ((lead1 & 0x0F00) >> 4));
-            quint8 byte3 = static_cast<quint8>(lead2 & 0x00FF);
-            quint8 byte4 = static_cast<quint8>((lead2 & 0x0F00) >> 8);
+            quint8 byte0 = static_cast<quint8>(leadI & 0x00FF);
+            quint8 byte1 = static_cast<quint8>(leadII & 0x00FF);
+            quint8 byte2 = static_cast<quint8>(((leadI & 0x0F00) >> 8) | ((leadII & 0x0F00) >> 4));
+            quint8 byte3 = static_cast<quint8>(leadV & 0x00FF);
+            quint8 byte4 = static_cast<quint8>((leadV & 0x0F00) >> 8);
 
             // Apply sign extension bits (as in original code)
-            if (lead0 & 0x8000) byte2 |= 0x08;  // Set bit 3 if lead0 is negative
-            if (lead1 & 0x8000) byte2 |= 0x80;  // Set bit 7 if lead1 is negative
-            if (lead2 & 0x8000) byte4 |= 0x08;  // Set bit 3 if lead2 is negative
+            if (leadI & 0x8000) byte2 |= 0x08;  // Set bit 3 if lead0 is negative
+            if (leadII & 0x8000) byte2 |= 0x80;  // Set bit 7 if lead1 is negative
+            if (leadV & 0x8000) byte4 |= 0x08;  // Set bit 3 if lead2 is negative
 
             // Append 5 bytes
             rawData.append(static_cast<char>(byte0));

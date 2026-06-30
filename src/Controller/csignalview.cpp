@@ -8,7 +8,7 @@ CSignalView::CSignalView(QObject *parent)
 
 CSignalView::~CSignalView()
 {
-    qDeleteAll(m_windgetList);
+    // qDeleteAll(m_windgetList);
     m_windgetList.clear();
 }
 

@@ -68,12 +68,7 @@ bool Cwfdb::readData(const SignalViewParameters &params)
         for (long sampleIndex = 0; sampleIndex < totalSamples; ++sampleIndex) {
             WFDB_Sample* signalData = new WFDB_Sample[numberOfSignals];
 
-            /*if (*/getvec(signalData);/* < 0) {
-                qDebug() << "Error reading sample at index" << sampleIndex;
-                delete[] signalData;
-                break;
-            }*/
-
+            getvec(signalData);
             // CORRECTED: Use signalIndex to access signalData
             for (int signalIndex = 0; signalIndex < numberOfSignals; ++signalIndex) {
                 allData[signalIndex][sampleIndex] = signalData[signalIndex];

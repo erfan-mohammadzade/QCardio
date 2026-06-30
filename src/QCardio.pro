@@ -9,9 +9,11 @@ CONFIG += c++17
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 SOURCES += \
     Controller/cexporter.cpp \
+    Controller/csettings.cpp \
     Controller/csignalview.cpp \
     Controller/cwfdb.cpp \
     Models/directoryvalidator.cpp \
+    Models/uiconfigs.cpp \
     Views/signalviewwidget.cpp \
     controller.cpp \
     main.cpp \
@@ -26,10 +28,12 @@ HEADERS += \
     Config/define.h \
     Config/structer.h \
     Controller/cexporter.h \
+    Controller/csettings.h \
     Controller/csignalview.h \
     Controller/cwfdb.h \
     Models/directoryvalidator.h \
     Models/sample.h \
+    Models/uiconfigs.h \
     Views/signalviewwidget.h \
     controller.h \
     Models/global_qcardio.h \

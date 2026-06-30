@@ -1,127 +1,4 @@
-// #include "controller.h"
-
-// #include <QProgressBar>
-
-// Controller::Controller(QObject *parent)
-//     : QObject{parent}
-// {
-//     m_mainWindow.show();
-//     connect(&m_mainWindow, &MainWindow::sigReadDataRequested,
-//             this, &Controller::sltOpenRecord);
-
-//     connect(this, &Controller::sigReadAutomaticDataRequested,
-//             this, &Controller::sltOpenRecord);
-
-//     connect(&m_mainWindow, &MainWindow::sigExportRequested,
-//             this, &Controller::sltExportRequested);
-
-//     connect(&m_mainWindow, &MainWindow::sigExportAllRequested,
-//             this, &Controller::sltExportAllRequested);
-
-//     connect(this, &Controller::sigReadDataProcessEnd, this,[=]()
-//             {
-//                 m_csignalView->setData(m_cwfdb->getStructData());
-//             });
-//     connect(this, &Controller::sigExportProcessEnd, this,[=]()
-//             {
-//                 QMessageBox::information(nullptr, "Export", "Export Process Completed");
-//             });
-
-//     m_cwfdb = new Cwfdb(this);
-//     m_csignalView = new CSignalView(this);
-//     m_cexporter = new CExporter(this);
-//     m_mainWindow.setSignalWidget(m_csignalView->windgetList());
-// }
-
-// void Controller::sltOpenRecord(const SignalViewParameters& params)
-// {
-//     QtConcurrent::run(QThreadPool::globalInstance(),[=] {
-//         m_cwfdb->readData(params);
-//         Q_EMIT sigReadDataProcessEnd();
-//     });
-// }
-
-// void Controller::sltExportRequested(const QString &path)
-// {
-//     QtConcurrent::run(QThreadPool::globalInstance(),[=] {
-//         // m_cexporter->exportDataInSample(m_cwfdb->getStructData(), path);
-//         m_cexporter->exportDataInRC7(m_cwfdb->getStructData(), path);
-//         Q_EMIT sigExportProcessEnd();
-//     });
-// }
-
-// void Controller::sltExportAllRequested(const SignalViewParameters& setting, const QStringList& path)
-// {
-//     QProgressBar *progressBar = new QProgressBar();
-//     progressBar->setRange(0, path.size());
-//     progressBar->setValue(0);
-//     progressBar->setVisible(true);
-
-//     QSharedPointer<QAtomicInt> counter = QSharedPointer<QAtomicInt>::create(0);
-//     QFutureWatcher<void> *watcher = new QFutureWatcher<void>();
-
-//     QStringList pathCopy = path;
-//     SignalViewParameters settingCopy = setting;
-
-//     QFuture<void> future = QtConcurrent::run(QThreadPool::globalInstance(),
-//                                              [=]() mutable
-//                                              {
-//                                                  for(const QString& id : pathCopy)
-//                                                  {
-//                                                      bool success = false;
-//                                                      int retryCount = 0;
-//                                                      const int MAX_RETRIES = 15;  // Maximum retry attempts
-
-//                                                      // Keep reading until success or max retries
-//                                                      settingCopy.signalFilePath = id;
-//                                                      while (!success && retryCount < MAX_RETRIES)
-//                                                      {
-//                                                          qDebug() << id << settingCopy.signalFilePath;
-
-//                                                          // readData returns bool (true = success)
-//                                                          Q_EMIT sigReadAutomaticDataRequested(settingCopy);
-
-//                                                          if (!success)
-//                                                          {
-//                                                              retryCount++;
-//                                                              qDebug() << "Read failed for" << id << "retry" << retryCount;
-
-//                                                              // Optional: Wait before retrying
-//                                                              QThread::msleep(1000);
-//                                                          }
-//                                                      }
-
-//                                                      if (success)
-//                                                      {
-//                                                          // Only export if read was successful
-//                                                          m_cexporter->exportDataInRC7(m_cwfdb->getStructData(), id);
-//                                                      }
-//                                                      else
-//                                                      {
-//                                                          qDebug() << "Failed to read data for" << id << "after" << MAX_RETRIES << "attempts";
-//                                                          // Handle failure - maybe skip this file or log error
-//                                                      }
-
-//                                                      // Update progress regardless of success/failure
-//                                                      int current = counter->fetchAndAddOrdered(1) + 1;
-//                                                      QMetaObject::invokeMethod(progressBar, "setValue",
-//                                                                                Qt::QueuedConnection,
-//                                                                                Q_ARG(int, current));
-//                                                  }
-//                                              }
-//                                              );
-
-//     connect(watcher, &QFutureWatcher<void>::finished,
-//             [progressBar, watcher]() {
-//                 progressBar->setVisible(false);
-//                 progressBar->deleteLater();
-//                 watcher->deleteLater();
-//             });
-
-//     watcher->setFuture(future);
-// }
 #include "controller.h"
-
 #include <QProgressBar>
 #include <QMessageBox>
 
@@ -155,6 +32,9 @@ Controller::Controller(QObject *parent)
     m_csignalView = new CSignalView(this);
     m_cexporter = new CExporter(this);
     m_mainWindow.setSignalWidget(m_csignalView->windgetList());
+    m_csetting.loadSetting(m_uiConfig);
+    m_mainWindow.loadUIConfig(m_uiConfig);
+    m_mainWindow.setSetting(&m_csetting);
 }
 
 void Controller::sltOpenRecord(const SignalViewParameters& params)
