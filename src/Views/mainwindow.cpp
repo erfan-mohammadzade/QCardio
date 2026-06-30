@@ -45,7 +45,6 @@ void MainWindow::on_pushButtonRead_clicked()
 
 void MainWindow::setupSignal(QGridLayout *mainLayout, SignalViewWidget* signalView)
 {
-    signalView->setMinimumHeight(200);
     mainLayout->addWidget(signalView);
 }
 

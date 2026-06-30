@@ -30,8 +30,8 @@ SignalViewWidget::SignalViewWidget(QWidget *parent)
     m_data.reserve(m_maxDataPoints);
 
     // Set widget properties
-    setMinimumSize(600, 300);
-    setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    setMinimumSize(600, 250);
+    setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
     setMouseTracking(true);
 
     // Initialize with some data
